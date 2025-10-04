@@ -84,7 +84,7 @@ Page({
       // 提示用户
       wx.showModal({
         title: '下载提示',
-        content: '视频下载链接已复制到剪贴板，请在浏览器中打开链接，浏览器将自动下载视频。',
+        content: '视频下载链接已复制到剪贴板，请在浏览器中打开链接',
         showCancel: false,
         confirmText: '知道了'
       })
