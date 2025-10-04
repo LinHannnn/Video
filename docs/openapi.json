@@ -1,0 +1,639 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "视频提取后端API",
+    "description": "基于Node.js开发的视频提取后端系统，支持多平台视频链接解析",
+    "version": "1.0.0",
+    "contact": {
+      "name": "视频提取后端团队",
+      "email": "support@videoextract.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "开发环境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "视频解析",
+      "description": "视频链接解析相关接口"
+    },
+    {
+      "name": "密钥管理", 
+      "description": "API密钥管理接口"
+    },
+    {
+      "name": "系统监控",
+      "description": "系统状态和监控接口"
+    }
+  ],
+  "paths": {
+    "/api/video/parse": {
+      "post": {
+        "tags": ["视频解析"],
+        "summary": "解析视频链接",
+        "description": "解析支持平台的视频分享链接，获取视频信息和下载地址。\n\n**✨ 简化使用：只需传递一个 `url` 字段即可！**\n\n支持的平台：抖音/TikTok、哔哩哔哩、小红书、快手等。系统会自动：\n- 识别视频平台类型\n- 从复杂分享文本中提取URL\n- 处理包含emoji和中文的分享链接\n- 调用相应的解析服务",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoParseRequest"
+              },
+              "examples": {
+                "simple_request": {
+                  "summary": "简化请求（推荐）- 只需URL",
+                  "value": {
+                    "url": "https://v.douyin.com/iFRvuEjE/"
+                  }
+                },
+                "douyin_example": {
+                  "summary": "抖音视频解析",
+                  "value": {
+                    "url": "https://v.douyin.com/iFRvuEjE/"
+                  }
+                },
+                "bilibili_example": {
+                  "summary": "哔哩哔哩视频解析",
+                  "value": {
+                    "url": "【标题】https://www.bilibili.com/video/BV1xx4y1Z7zz 🌟分享内容"
+                  }
+                },
+                "xiaohongshu_example": {
+                  "summary": "小红书视频解析",
+                  "value": {
+                    "url": "😊 看了这个视频 https://www.xiaohongshu.com/discovery/item/xxx 👍"
+                  }
+                },
+                "full_request_example": {
+                  "summary": "完整请求格式（兼容旧版本）",
+                  "value": {
+                    "url": "https://v.douyin.com/iFRvuEjE/",
+                    "platform": "auto",
+                    "options": {
+                      "preferredQuality": "high",
+                      "extractAudio": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "解析成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoParseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/video/platforms": {
+      "get": {
+        "tags": ["视频解析"],
+        "summary": "获取支持的平台列表",
+        "description": "获取系统支持的所有视频平台信息",
+        "responses": {
+          "200": {
+            "description": "成功返回支持的平台列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/video/health": {
+      "get": {
+        "tags": ["系统监控"],
+        "summary": "健康检查",
+        "description": "检查API服务和数据库的运行状态",
+        "responses": {
+          "200": {
+            "description": "服务正常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/keys": {
+      "get": {
+        "tags": ["密钥管理"],
+        "summary": "获取API密钥列表",
+        "description": "获取所有API密钥的详细信息",
+        "responses": {
+          "200": {
+            "description": "成功返回密钥列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeyListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["密钥管理"],
+        "summary": "添加新的API密钥",
+        "description": "向系统添加新的第三方API密钥",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密钥添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/keys/{keyId}": {
+      "get": {
+        "tags": ["密钥管理"],
+        "summary": "获取指定密钥详情",
+        "parameters": [
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回密钥详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeyDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["密钥管理"],
+        "summary": "更新API密钥",
+        "parameters": [
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密钥更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["密钥管理"],
+        "summary": "删除API密钥",
+        "parameters": [
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "密钥删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VideoParseRequest": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "视频分享链接（支持抖音、B站、小红书、快手等平台，系统会自动识别平台类型）",
+            "minLength": 10,
+            "maxLength": 2000,
+            "example": "https://v.douyin.com/iFRvuEjE/"
+          }
+        }
+      },
+      "VideoParseRequestFull": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "视频分享链接",
+            "example": "https://v.douyin.com/iFRvuEjE/"
+          },
+          "platform": {
+            "type": "string",
+            "description": "平台类型（可选，默认自动识别）",
+            "enum": ["auto", "douyin", "tiktok", "bilibili", "xiaohongshu", "kuaishou"],
+            "default": "auto"
+          },
+          "options": {
+            "type": "object",
+            "description": "解析选项（可选）",
+            "properties": {
+              "preferredQuality": {
+                "type": "string",
+                "description": "期望视频质量（可选，默认high）",
+                "enum": ["high", "medium", "low"],
+                "default": "high"
+              },
+              "extractAudio": {
+                "type": "boolean",
+                "description": "是否提取音频（可选，默认false）",
+                "default": false
+              }
+            }
+          }
+        }
+      },
+      "VideoParseResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "解析成功"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "platform": {
+                "type": "string",
+                "example": "抖音"
+              },
+              "title": {
+                "type": "string",
+                "example": "精彩视频标题"
+              },
+              "author": {
+                "type": "string",
+                "example": "创作者昵称"
+              },
+              "videoUrl": {
+                "type": "string",
+                "example": "https://aweme.snssdk.com/aweme/v1/xxx"
+              },
+              "coverImage": {
+                "type": "string",
+                "example": "https://p3-sign.douyinpic.com/xxx"
+              }
+            }
+          },
+          "exec_time": {
+            "type": "number",
+            "example": 1.234
+          },
+          "user_ip": {
+            "type": "string",
+            "example": "127.0.0.1"
+          }
+        }
+      },
+      "PlatformsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "获取成功"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "example": "douyin"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "抖音/TikTok"
+                    }
+                  }
+                }
+              },
+              "total": {
+                "type": "integer",
+                "example": 4
+              }
+            }
+          }
+        }
+      },
+      "HealthCheckResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "服务正常"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "example": "healthy"
+              },
+              "database": {
+                "type": "string",
+                "example": "connected"
+              },
+              "features": {
+                "type": "object",
+                "properties": {
+                  "video_parsing": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "key_management": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateKeyRequest": {
+        "type": "object",
+        "required": ["keyName", "keyValue"],
+        "properties": {
+          "keyName": {
+            "type": "string",
+            "example": "主密钥1"
+          },
+          "keyValue": {
+            "type": "string",
+            "example": "52api_your_actual_key_here"
+          },
+          "description": {
+            "type": "string",
+            "example": "主要使用的52API密钥"
+          }
+        }
+      },
+      "UpdateKeyRequest": {
+        "type": "object",
+        "properties": {
+          "keyName": {
+            "type": "string"
+          },
+          "keyValue": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive"]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "KeyListResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "获取成功"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKey"
+            }
+          }
+        }
+      },
+      "KeyDetailResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "data": {
+            "$ref": "#/components/schemas/ApiKey"
+          }
+        }
+      },
+      "CreateKeyResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "添加成功"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 123
+              },
+              "keyName": {
+                "type": "string",
+                "example": "主密钥1"
+              },
+              "status": {
+                "type": "string",
+                "example": "active"
+              }
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "操作成功"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 400
+          },
+          "msg": {
+            "type": "string",
+            "example": "请求参数错误"
+          },
+          "data": {
+            "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ApiKey": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "keyName": {
+            "type": "string",
+            "example": "主密钥1"
+          },
+          "keyValue": {
+            "type": "string",
+            "example": "52api_actual_key_value"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive"],
+            "example": "active"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "主要使用的密钥"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-01T09:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-15T10:30:00.000Z"
+          }
+        }
+      }
+    }
+  }
+} 

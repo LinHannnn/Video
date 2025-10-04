@@ -1,0 +1,102 @@
+<!--pages/home/home.wxml-->
+<view class="container">
+  <!-- 应用标题 -->
+  <view class="app-title">
+    <text class="title-text">视频提取助手</text>
+    <text class="subtitle-text">支持主流平台视频无水印下载</text>
+  </view>
+
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <textarea 
+      class="url-input"
+      placeholder="请粘贴视频链接..."
+      value="{{inputUrl}}"
+      bindinput="onInputChange"
+      maxlength="1000"
+      auto-height
+      show-confirm-bar="{{false}}"
+    ></textarea>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="button-section">
+    <button 
+      class="action-btn clear-btn" 
+      bindtap="onClear"
+      disabled="{{!inputUrl}}"
+    >
+      清空
+    </button>
+    
+    <button 
+      class="action-btn parse-btn {{isLoading ? 'loading' : ''}}" 
+      bindtap="onPasteAndParse"
+      disabled="{{isLoading}}"
+    >
+      {{isLoading ? '解析中...' : '粘贴并解析'}}
+    </button>
+  </view>
+
+  <!-- 免责声明提示 -->
+  <view class="disclaimer-notice">
+    <text class="notice-text">使用即表示您已同意我们的免责声明</text>
+  </view>
+</view>
+
+<!-- 登录弹窗 -->
+<view wx:if="{{showLoginModal}}" class="modal-overlay" bindtap="onCloseLoginModal">
+  <view class="modal-content login-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">登录提示</text>
+    </view>
+    <view class="modal-body">
+      <view class="login-tips">
+        <text class="tips-icon">🔐</text>
+        <text class="tips-text">为了给您提供更好的服务，请先登录</text>
+      </view>
+    </view>
+    <view class="modal-footer login-footer">
+      <button class="modal-btn cancel-btn" bindtap="onCloseLoginModal">
+        暂不登录
+      </button>
+      <!-- 快速登录（不获取手机号）-->
+      <button class="modal-btn simple-login-btn" bindtap="onSimpleLogin">
+        快速登录
+      </button>
+      <!-- 授权手机号登录 -->
+      <button 
+        class="modal-btn phone-login-btn" 
+        open-type="getPhoneNumber" 
+        bindgetphonenumber="onGetPhoneNumber"
+      >
+        手机号登录
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 免责声明弹窗 -->
+<view wx:if="{{showDisclaimer}}" class="modal-overlay" bindtap="onCloseDisclaimer">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">免责声明</text>
+    </view>
+    <view class="modal-body">
+      <text class="disclaimer-content">
+        本小程序下载的资源仅供学习和研究，请在下载后24小时内删除。
+        若您使用本小程序服务提供的数据导致侵犯任何第三方的知识产权，
+        由此产生的任何责任和后果均由您自行承担，
+        本小程序不承担任何责任。
+      </text>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel-btn" bindtap="onCloseDisclaimer">
+        取消
+      </button>
+      <button class="modal-btn confirm-btn" bindtap="onConfirmExtract">
+        确认并继续
+      </button>
+    </view>
+  </view>
+</view> 

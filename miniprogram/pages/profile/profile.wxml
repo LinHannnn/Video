@@ -1,0 +1,127 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-info">
+    <view class="avatar-section">
+      <image 
+        class="avatar" 
+        src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" 
+        mode="aspectFill"
+      />
+      <view class="user-details">
+        <text class="nickname">{{userInfo.nickName || '未登录'}}</text>
+        <text class="login-status">{{isLoggedIn ? '已登录' : '未登录'}}</text>
+      </view>
+    </view>
+    
+    <view wx:if="{{!isLoggedIn}}" class="login-section">
+      <button class="btn-primary login-btn" bindtap="onLogin">
+        微信一键登录
+      </button>
+      <button class="btn-secondary guest-btn" bindtap="onGuestLogin">
+        游客模式
+      </button>
+    </view>
+    
+    <view wx:else class="logout-section">
+      <button class="btn-secondary logout-btn" bindtap="onLogout">
+        退出登录
+      </button>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="onShowDisclaimer">
+      <view class="menu-icon">📋</view>
+      <view class="menu-content">
+        <text class="menu-title">免责声明</text>
+        <text class="menu-desc">查看完整免责声明</text>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+    
+    <view class="menu-item" bindtap="onContactService">
+      <view class="menu-icon">💬</view>
+      <view class="menu-content">
+        <text class="menu-title">联系客服</text>
+        <text class="menu-desc">遇到问题？联系我们</text>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+    
+    <view class="menu-item" bindtap="onAbout">
+      <view class="menu-icon">ℹ️</view>
+      <view class="menu-content">
+        <text class="menu-title">关于我们</text>
+        <text class="menu-desc">了解更多信息</text>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text class="version-text">版本号：1.0.0</text>
+    <text class="copyright">© 2024 视频提取助手</text>
+  </view>
+</view>
+
+<!-- 免责声明弹窗 -->
+<view wx:if="{{showDisclaimer}}" class="modal-overlay" bindtap="onCloseDisclaimer">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">免责声明</text>
+      <text class="modal-close" bindtap="onCloseDisclaimer">×</text>
+    </view>
+    <view class="modal-body">
+      <scroll-view scroll-y class="disclaimer-scroll">
+        <text class="disclaimer-content">
+          本小程序下载的资源仅供学习和研究，请在3小时内删除。
+          若您使用本小程序服务提供的数据导致侵犯任何第三方的知识产权，
+          由此产生的任何责任和后果均由您自行承担，
+          本小程序不承担任何责任。
+          
+          1. 本服务仅提供技术支持，不对内容的合法性负责
+          2. 用户应遵守相关法律法规和平台规定
+          3. 禁止用于商业用途或传播违法内容
+          4. 本小程序不存储任何用户数据
+          5. 如有侵权请及时联系我们删除
+        </text>
+      </scroll-view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-primary" bindtap="onCloseDisclaimer">我知道了</button>
+    </view>
+  </view>
+</view>
+
+<!-- 关于我们弹窗 -->
+<view wx:if="{{showAbout}}" class="modal-overlay" bindtap="onCloseAbout">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">关于我们</text>
+      <text class="modal-close" bindtap="onCloseAbout">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="about-content">
+        <text class="about-title">视频提取助手</text>
+        <text class="about-desc">一款免费的视频链接解析工具</text>
+        
+        <view class="feature-list">
+          <view class="feature-item">✅ 支持多平台视频解析</view>
+          <view class="feature-item">✅ 永久免费使用</view>
+          <view class="feature-item">✅ 不存储任何数据</view>
+          <view class="feature-item">✅ 简洁易用的界面</view>
+        </view>
+        
+        <text class="contact-info">
+          如有问题或建议，请联系客服
+        </text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-primary" bindtap="onCloseAbout">确定</button>
+    </view>
+  </view>
+</view> 

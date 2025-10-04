@@ -1,0 +1,123 @@
+<!--pages/service/service.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">联系客服</text>
+    <text class="subtitle">遇到问题？我们来帮您解决</text>
+  </view>
+
+  <!-- 客服信息 -->
+  <view class="service-info">
+    <!-- 客服二维码 -->
+    <view class="qrcode-section">
+      <view class="qrcode-container">
+        <image 
+          class="qrcode-image" 
+          src="/images/service-qrcode.png" 
+          mode="aspectFit"
+          binderror="onQrcodeError"
+        />
+        <view class="qrcode-placeholder" wx:if="{{!qrcodeLoaded}}">
+          <text class="placeholder-icon">📱</text>
+          <text class="placeholder-text">客服二维码</text>
+        </view>
+      </view>
+      <text class="qrcode-desc">扫描二维码添加客服微信</text>
+    </view>
+
+    <!-- 微信号信息 -->
+    <view class="wechat-info">
+      <view class="info-item">
+        <text class="info-label">客服微信号：</text>
+        <text class="info-value" selectable>{{wechatId}}</text>
+        <button class="btn-secondary copy-btn" data-text="{{wechatId}}" bindtap="onCopy">
+          复制
+        </button>
+      </view>
+      
+      <view class="info-item">
+        <text class="info-label">服务时间：</text>
+        <text class="info-value">周一至周日 9:00-22:00</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="instructions">
+    <view class="instruction-header">
+      <text class="instruction-title">联系方式</text>
+    </view>
+    
+    <view class="instruction-list">
+      <view class="instruction-item">
+        <view class="step-number">1</view>
+        <view class="step-content">
+          <text class="step-title">扫描二维码</text>
+          <text class="step-desc">使用微信扫描上方二维码</text>
+        </view>
+      </view>
+      
+      <view class="instruction-item">
+        <view class="step-number">2</view>
+        <view class="step-content">
+          <text class="step-title">添加好友</text>
+          <text class="step-desc">发送好友申请并等待通过</text>
+        </view>
+      </view>
+      
+      <view class="instruction-item">
+        <view class="step-number">3</view>
+        <view class="step-content">
+          <text class="step-title">描述问题</text>
+          <text class="step-desc">详细描述您遇到的问题</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="faq-section">
+    <view class="faq-header">
+      <text class="faq-title">常见问题</text>
+    </view>
+    
+    <view class="faq-list">
+      <view class="faq-item" wx:for="{{faqList}}" wx:key="id" bindtap="onToggleFaq" data-index="{{index}}">
+        <view class="faq-question">
+          <text class="question-text">{{item.question}}</text>
+          <text class="toggle-icon {{item.expanded ? 'expanded' : ''}}">▼</text>
+        </view>
+        <view class="faq-answer {{item.expanded ? 'show' : ''}}">
+          <text class="answer-text">{{item.answer}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 反馈建议 -->
+  <view class="feedback-section">
+    <view class="feedback-header">
+      <text class="feedback-title">意见反馈</text>
+    </view>
+    
+    <view class="feedback-form">
+      <textarea 
+        class="feedback-input"
+        placeholder="请描述您遇到的问题或建议..."
+        value="{{feedbackText}}"
+        bindinput="onFeedbackInput"
+        maxlength="500"
+        auto-height
+      ></textarea>
+      <view class="input-counter">{{feedbackText.length}}/500</view>
+      
+      <button 
+        class="btn-primary submit-btn {{!feedbackText.trim() ? 'disabled' : ''}}"
+        bindtap="onSubmitFeedback"
+        disabled="{{!feedbackText.trim()}}"
+      >
+        提交反馈
+      </button>
+    </view>
+  </view>
+</view> 

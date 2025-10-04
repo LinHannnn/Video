@@ -1,0 +1,267 @@
+/* pages/video-detail/video-detail.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+/* 页面标题 */
+.page-header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 视频预览区域 */
+.video-preview {
+  width: 100%;
+  max-width: 600rpx;
+  margin-bottom: 40rpx;
+}
+
+.video-wrapper {
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.video-cover {
+  width: 100%;
+  height: 400rpx;
+  display: block;
+  background: #f5f5f5;
+}
+
+/* 播放按钮覆盖层 */
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+}
+
+.play-button {
+  width: 120rpx;
+  height: 120rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.play-button:active {
+  transform: scale(0.95);
+}
+
+.play-icon {
+  font-size: 48rpx;
+  color: #007aff;
+  margin-left: 8rpx;
+}
+
+/* 视频信息 */
+.video-info {
+  padding: 32rpx;
+}
+
+.video-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 16rpx;
+  word-break: break-all;
+}
+
+.video-meta {
+  display: flex;
+  gap: 24rpx;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  font-size: 26rpx;
+  color: #666;
+  background: #f8f9fa;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  width: 100%;
+  max-width: 600rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.action-btn {
+  width: 100%;
+  height: 88rpx;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.copy-btn {
+  background: #fff;
+  color: #007aff;
+  border: 2rpx solid #007aff;
+}
+
+.copy-btn:active {
+  background: #f0f7ff;
+  transform: scale(0.98);
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.3);
+}
+
+.download-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.3);
+}
+
+/* 返回按钮 */
+.back-section {
+  margin-top: auto;
+  padding-top: 40rpx;
+}
+
+.back-btn {
+  background: #f5f5f5;
+  color: #666;
+  border: none;
+  border-radius: 50rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-btn:active {
+  background: #e0e0e0;
+  transform: scale(0.98);
+}
+
+/* 视频播放器弹窗 */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.video-modal-content {
+  width: 90%;
+  max-width: 700rpx;
+  position: relative;
+  background: #000;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.modal-video {
+  width: 100%;
+  height: 400rpx;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border-radius: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  z-index: 1001;
+}
+
+.close-btn:active {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* 无数据状态 */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.no-data-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.no-data-text {
+  font-size: 32rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 480rpx) {
+  .video-cover {
+    height: 300rpx;
+  }
+  
+  .play-overlay {
+    height: 300rpx;
+  }
+  
+  .play-button {
+    width: 100rpx;
+    height: 100rpx;
+    border-radius: 50rpx;
+  }
+  
+  .play-icon {
+    font-size: 40rpx;
+  }
+} 

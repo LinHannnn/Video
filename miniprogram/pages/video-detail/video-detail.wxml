@@ -1,0 +1,93 @@
+<!--pages/video-detail/video-detail.wxml-->
+<block wx:if="{{videoInfo}}">
+  <view class="container">
+  
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">解析出的视频结果</text>
+  </view>
+
+  <!-- 视频预览区域 -->
+  <view class="video-preview">
+    <view class="video-wrapper">
+      <!-- 视频封面或播放器 -->
+      <image 
+        class="video-cover" 
+        src="{{videoInfo.coverImage || videoInfo.coverUrl}}" 
+        mode="aspectFill"
+        bindtap="onPlayVideo"
+      />
+      
+      <!-- 播放按钮覆盖层 -->
+      <view class="play-overlay" bindtap="onPlayVideo">
+        <view class="play-button">
+          <text class="play-icon">▶</text>
+        </view>
+      </view>
+      
+      <!-- 视频信息 -->
+      <view class="video-info">
+        <text class="video-title">{{videoInfo.title || videoInfo.work_title || '无标题'}}</text>
+        <view class="video-meta">
+          <text class="meta-item" wx:if="{{videoInfo.duration}}">时长: {{videoInfo.duration}}</text>
+          <text class="meta-item" wx:if="{{videoInfo.size}}">大小: {{videoInfo.size}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button 
+      class="action-btn copy-btn" 
+      bindtap="onCopyVideoUrl"
+      hover-class="btn-hover"
+    >
+      复制视频链接
+    </button>
+    
+    <button 
+      class="action-btn download-btn" 
+      bindtap="onDownload"
+      hover-class="btn-hover"
+    >
+      下载视频至本地
+    </button>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-section">
+    <button class="back-btn" bindtap="goBack">
+      返回首页
+    </button>
+  </view>
+
+  </view>
+</block>
+
+<!-- 无视频信息时的提示（需紧邻 videoInfo 的 wx:if 才能正确互斥） -->
+<block wx:else>
+  <view class="no-data">
+    <view class="no-data-icon">📹</view>
+    <text class="no-data-text">视频信息不存在</text>
+    <button class="back-btn" bindtap="goBack">返回首页</button>
+  </view>
+</block>
+
+<!-- 视频播放器弹窗 -->
+<view wx:if="{{showVideoPlayer}}" class="video-modal" bindtap="onClosePlayer">
+  <view class="video-modal-content" catchtap="stopPropagation">
+    <video 
+      class="modal-video"
+      src="{{videoInfo.videoUrl}}"
+      poster="{{videoInfo.coverImage || videoInfo.coverUrl}}"
+      controls="{{true}}"
+      autoplay="{{true}}"
+      show-fullscreen-btn="{{true}}"
+      show-play-btn="{{true}}"
+      show-center-play-btn="{{true}}"
+      bindended="onClosePlayer"
+    />
+    <view class="close-btn" bindtap="onClosePlayer">×</view>
+  </view>
+</view>

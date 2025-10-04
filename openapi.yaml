@@ -1,0 +1,878 @@
+openapi: 3.0.3
+info:
+  title: 视频提取后端API
+  description: |
+    基于Node.js开发的视频提取后端系统，支持多平台视频链接解析。
+    
+    ## 功能特性
+    - 🎯 支持抖音/TikTok、哔哩哔哩、小红书、快手等平台
+    - 🔑 完整的API密钥管理系统
+    - 🛡️ 请求频率限制和安全防护
+    - 📝 详细的请求和错误日志
+    
+    ## 认证说明
+    本API目前不需要认证，但建议在生产环境中实施适当的认证机制。
+    
+    ## 请求限制
+    - 通用接口: 15分钟内最多100次请求
+    - 视频解析: 5分钟内最多20次请求  
+    - 管理接口: 10分钟内最多50次请求
+  version: 1.0.0
+  contact:
+    name: 视频提取后端团队
+    email: support@videoextract.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: 开发环境
+  - url: https://api.videoextract.com
+    description: 生产环境
+
+tags:
+  - name: 视频解析
+    description: 视频链接解析相关接口
+  - name: 密钥管理
+    description: API密钥管理接口
+  - name: 系统监控
+    description: 系统状态和监控接口
+
+paths:
+  /:
+    get:
+      tags:
+        - 系统监控
+      summary: 获取API服务信息
+      description: 获取API服务的基本信息和文档链接
+      responses:
+        '200':
+          description: 成功返回服务信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceInfoResponse'
+
+  /api:
+    get:
+      tags:
+        - 系统监控
+      summary: 获取API文档
+      description: 获取所有可用API接口的文档信息
+      responses:
+        '200':
+          description: 成功返回API文档
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDocResponse'
+
+  /api/video/parse:
+    post:
+      tags:
+        - 视频解析
+      summary: 解析视频链接
+      description: |
+        解析支持平台的视频分享链接，获取视频信息和下载地址。
+        
+        ### 支持的平台
+        - 抖音/TikTok (douyin.com, tiktok.com)
+        - 哔哩哔哩 (bilibili.com, b23.tv)
+        - 小红书 (xiaohongshu.com, xhslink.com)
+        - 快手 (kuaishou.com)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoParseRequest'
+            examples:
+              douyin_example:
+                summary: 抖音视频解析
+                value:
+                  url: "https://v.douyin.com/iFRvuEjE/"
+                  platform: "auto"
+                  options:
+                    preferredQuality: "high"
+                    extractAudio: false
+              bilibili_example:
+                summary: 哔哩哔哩视频解析
+                value:
+                  url: "【标题】https://www.bilibili.com/video/BV1xx4y1Z7zz 🌟分享内容"
+                  platform: "bilibili"
+                  options:
+                    preferredQuality: "medium"
+              xiaohongshu_example:
+                summary: 小红书视频解析
+                value:
+                  url: "😊 看了这个视频 https://www.xiaohongshu.com/discovery/item/xxx 👍"
+                  platform: "xiaohongshu"
+      responses:
+        '200':
+          description: 解析成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoParseResponse'
+              examples:
+                success_example:
+                  summary: 解析成功示例
+                  value:
+                    code: 200
+                    msg: "解析成功"
+                    data:
+                      platform: "抖音"
+                      title: "精彩视频标题"
+                      author: "创作者昵称"
+                      duration: "00:30"
+                      videoUrl: "https://aweme.snssdk.com/aweme/v1/xxx"
+                      coverImage: "https://p3-sign.douyinpic.com/xxx"
+                      description: "视频描述内容"
+                    debug: null
+                    exec_time: 1.234
+                    user_ip: "127.0.0.1"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation_error:
+                  summary: 参数验证失败
+                  value:
+                    code: 400
+                    msg: "请求参数验证失败"
+                    data: null
+                    errors:
+                      - field: "url"
+                        message: "URL不能为空"
+                    debug: null
+                    exec_time: 0.05
+                    user_ip: "127.0.0.1"
+                unsupported_platform:
+                  summary: 不支持的平台
+                  value:
+                    code: 400
+                    msg: "不支持的平台，请检查URL是否来自支持的平台"
+                    data: null
+                    debug: null
+                    exec_time: 0.02
+                    user_ip: "127.0.0.1"
+        '429':
+          description: 请求过于频繁
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/video/platforms:
+    get:
+      tags:
+        - 视频解析
+      summary: 获取支持的平台列表
+      description: 获取系统支持的所有视频平台信息
+      responses:
+        '200':
+          description: 成功返回支持的平台列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformsResponse'
+              example:
+                code: 200
+                msg: "获取成功"
+                data:
+                  platforms:
+                    - key: "douyin"
+                      name: "抖音/TikTok"
+                    - key: "bilibili"
+                      name: "哔哩哔哩"
+                    - key: "xiaohongshu"
+                      name: "小红书"
+                    - key: "kuaishou"
+                      name: "快手"
+                  total: 4
+                debug: null
+                exec_time: 0.001
+                user_ip: "127.0.0.1"
+
+  /api/video/health:
+    get:
+      tags:
+        - 系统监控
+      summary: 健康检查
+      description: 检查API服务和数据库的运行状态
+      responses:
+        '200':
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+              example:
+                code: 200
+                msg: "服务正常"
+                data:
+                  status: "healthy"
+                  timestamp: "2025-09-15T19:00:00.000Z"
+                  version: "1.0.0"
+                  node_version: "v18.17.0"
+                  uptime: 3600
+                  database: "connected"
+                  features:
+                    video_parsing: true
+                    key_management: true
+                debug: null
+                exec_time: 0.05
+                user_ip: "127.0.0.1"
+
+  /api/admin/keys:
+    get:
+      tags:
+        - 密钥管理
+      summary: 获取API密钥列表
+      description: 获取所有API密钥的详细信息，包括状态和使用情况
+      responses:
+        '200':
+          description: 成功返回密钥列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyListResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - 密钥管理
+      summary: 添加新的API密钥
+      description: 向系统添加新的第三方API密钥
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKeyRequest'
+            example:
+              keyName: "主密钥1"
+              keyValue: "52api_your_actual_key_here"
+              description: "主要使用的52API密钥"
+      responses:
+        '200':
+          description: 密钥添加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateKeyResponse'
+        '400':
+          description: 请求参数错误或密钥名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/keys/{keyId}:
+    get:
+      tags:
+        - 密钥管理
+      summary: 获取指定密钥详情
+      description: 根据密钥ID获取密钥的详细信息
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          description: 密钥的唯一标识符
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: 成功返回密钥详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyDetailResponse'
+        '404':
+          description: 密钥不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - 密钥管理
+      summary: 更新API密钥
+      description: 更新指定密钥的信息，包括名称、值、状态和描述
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          description: 要更新的密钥ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKeyRequest'
+            example:
+              keyName: "更新后的密钥名称"
+              status: "active"
+              description: "更新后的描述"
+      responses:
+        '200':
+          description: 密钥更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 密钥不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - 密钥管理
+      summary: 删除API密钥
+      description: 从系统中删除指定的API密钥
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          description: 要删除的密钥ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: 密钥删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: 密钥不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/keys/batch/status:
+    post:
+      tags:
+        - 密钥管理
+      summary: 批量更新密钥状态
+      description: 批量更新多个密钥的状态（启用/禁用）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpdateRequest'
+            example:
+              keyIds: [1, 2, 3]
+              status: "inactive"
+      responses:
+        '200':
+          description: 批量更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchUpdateResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    # 请求模型
+    VideoParseRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: 视频分享链接
+          minLength: 10
+          maxLength: 2000
+          example: "https://v.douyin.com/iFRvuEjE/"
+        platform:
+          type: string
+          description: 平台类型，auto为自动识别
+          enum: [auto, douyin, tiktok, bilibili, xiaohongshu, kuaishou]
+          default: auto
+        options:
+          type: object
+          description: 解析选项
+          properties:
+            preferredQuality:
+              type: string
+              description: 期望的视频质量
+              enum: [high, medium, low]
+              example: high
+            extractAudio:
+              type: boolean
+              description: 是否提取音频
+              default: false
+
+    CreateKeyRequest:
+      type: object
+      required:
+        - keyName
+        - keyValue
+      properties:
+        keyName:
+          type: string
+          description: 密钥名称
+          minLength: 2
+          maxLength: 100
+          example: "主密钥1"
+        keyValue:
+          type: string
+          description: 密钥值
+          minLength: 10
+          maxLength: 255
+          example: "52api_your_actual_key_here"
+        description:
+          type: string
+          description: 密钥描述
+          maxLength: 500
+          example: "主要使用的52API密钥"
+
+    UpdateKeyRequest:
+      type: object
+      properties:
+        keyName:
+          type: string
+          description: 密钥名称
+          minLength: 2
+          maxLength: 100
+        keyValue:
+          type: string
+          description: 密钥值
+          minLength: 10
+          maxLength: 255
+        status:
+          type: string
+          description: 密钥状态
+          enum: [active, inactive]
+        description:
+          type: string
+          description: 密钥描述
+          maxLength: 500
+
+    BatchUpdateRequest:
+      type: object
+      required:
+        - keyIds
+        - status
+      properties:
+        keyIds:
+          type: array
+          description: 要更新的密钥ID列表
+          items:
+            type: integer
+          minItems: 1
+          maxItems: 50
+          example: [1, 2, 3]
+        status:
+          type: string
+          description: 新的状态
+          enum: [active, inactive]
+          example: inactive
+
+    # 响应模型
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 200
+        msg:
+          type: string
+          description: 状态信息
+          example: "操作成功"
+        debug:
+          type: string
+          nullable: true
+          description: 调试信息（仅开发环境）
+        exec_time:
+          type: number
+          description: 执行耗时（秒）
+          example: 0.123
+        user_ip:
+          type: string
+          description: 客户端IP地址
+          example: "127.0.0.1"
+
+    VideoParseResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                platform:
+                  type: string
+                  description: 平台名称
+                  example: "抖音"
+                title:
+                  type: string
+                  description: 视频标题
+                  example: "精彩视频标题"
+                author:
+                  type: string
+                  description: 作者信息
+                  example: "创作者昵称"
+                duration:
+                  type: string
+                  description: 视频时长
+                  example: "00:30"
+                videoUrl:
+                  type: string
+                  description: 视频下载链接
+                  example: "https://aweme.snssdk.com/aweme/v1/xxx"
+                coverImage:
+                  type: string
+                  description: 封面图片
+                  example: "https://p3-sign.douyinpic.com/xxx"
+                description:
+                  type: string
+                  description: 视频描述
+                  example: "视频描述内容"
+                audioUrl:
+                  type: string
+                  description: 音频链接（如果提取音频）
+                  nullable: true
+
+    PlatformsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                platforms:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        description: 平台标识
+                        example: "douyin"
+                      name:
+                        type: string
+                        description: 平台名称
+                        example: "抖音/TikTok"
+                total:
+                  type: integer
+                  description: 支持的平台总数
+                  example: 4
+
+    HealthCheckResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: 服务状态
+                  example: "healthy"
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: 当前时间戳
+                version:
+                  type: string
+                  description: 服务版本
+                  example: "1.0.0"
+                node_version:
+                  type: string
+                  description: Node.js版本
+                  example: "v18.17.0"
+                uptime:
+                  type: number
+                  description: 服务运行时间（秒）
+                  example: 3600
+                database:
+                  type: string
+                  description: 数据库连接状态
+                  enum: [connected, disconnected, error]
+                  example: "connected"
+                features:
+                  type: object
+                  description: 功能可用性
+                  properties:
+                    video_parsing:
+                      type: boolean
+                      description: 视频解析功能是否可用
+                      example: true
+                    key_management:
+                      type: boolean
+                      description: 密钥管理功能是否可用
+                      example: true
+
+    KeyListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ApiKey'
+
+    KeyDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ApiKey'
+
+    CreateKeyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: 新创建的密钥ID
+                  example: 123
+                keyName:
+                  type: string
+                  description: 密钥名称
+                  example: "主密钥1"
+                status:
+                  type: string
+                  description: 密钥状态
+                  example: "active"
+
+    BatchUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                updatedCount:
+                  type: integer
+                  description: 更新的密钥数量
+                  example: 3
+                status:
+                  type: string
+                  description: 设置的状态
+                  example: "inactive"
+
+    SuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              nullable: true
+
+    ServiceInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "video-extract-backend"
+                version:
+                  type: string
+                  example: "1.0.0"
+                description:
+                  type: string
+                  example: "基于Node.js的视频提取后端系统"
+                author:
+                  type: string
+                  example: "Video Extract Team"
+                documentation:
+                  type: object
+                  properties:
+                    video_parse:
+                      type: string
+                      example: "/api/video/parse"
+                    platforms:
+                      type: string
+                      example: "/api/video/platforms"
+                    health:
+                      type: string
+                      example: "/api/video/health"
+                    admin_keys:
+                      type: string
+                      example: "/api/admin/keys"
+
+    ApiDocResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                video_apis:
+                  type: object
+                admin_apis:
+                  type: object
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              nullable: true
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    description: 错误字段
+                    example: "url"
+                  message:
+                    type: string
+                    description: 错误信息
+                    example: "URL不能为空"
+
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 密钥唯一标识
+          example: 1
+        keyName:
+          type: string
+          description: 密钥名称
+          example: "主密钥1"
+        keyValue:
+          type: string
+          description: 密钥值
+          example: "52api_actual_key_value"
+        status:
+          type: string
+          description: 密钥状态
+          enum: [active, inactive]
+          example: "active"
+        description:
+          type: string
+          nullable: true
+          description: 密钥描述
+          example: "主要使用的密钥"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-01T09:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-01-15T10:30:00.000Z"
+
+  responses:
+    NotFound:
+      description: 请求的资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 404
+            msg: "请求的资源不存在"
+            data: null
+            debug: null
+            exec_time: 0.001
+            user_ip: "127.0.0.1"
+
+    TooManyRequests:
+      description: 请求过于频繁
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 429
+            msg: "请求过于频繁，请稍后再试"
+            data: null
+            debug: null
+            exec_time: 0.001
+            user_ip: "127.0.0.1"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 500
+            msg: "服务器内部错误"
+            data: null
+            debug: null
+            exec_time: 0.001
+            user_ip: "127.0.0.1"
+
+  parameters:
+    KeyId:
+      name: keyId
+      in: path
+      required: true
+      description: 密钥的唯一标识符
+      schema:
+        type: integer
+        minimum: 1
+      example: 1 

@@ -1,0 +1,31 @@
+# 临时解决方案
+
+由于缺少图标文件，小程序可能无法正常启动。
+
+## 快速解决方法：
+
+1. **临时移除图标**：修改 app.json 中的 tabBar 配置，暂时不使用图标
+2. **使用文字导航**：只显示文字，不显示图标
+3. **下载图标**：从免费图标库下载合适的图标
+
+## 或者使用以下临时配置：
+
+将 app.json 中的 tabBar 修改为：
+```json
+"tabBar": {
+  "color": "#7A7E83",
+  "selectedColor": "#3cc51f",
+  "borderStyle": "black",
+  "backgroundColor": "#ffffff",
+  "list": [
+    {
+      "pagePath": "pages/home/home",
+      "text": "首页"
+    },
+    {
+      "pagePath": "pages/profile/profile", 
+      "text": "我的"
+    }
+  ]
+}
+``` 
