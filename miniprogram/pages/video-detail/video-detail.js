@@ -71,14 +71,20 @@ Page({
     try {
       util.showLoading('准备下载...')
       
+      // 构建下载代理链接
+      const api = require('../../utils/api.js')
+      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://jzhtreabislo.sealosbja.site/api' }
+      const title = videoInfo.title || videoInfo.work_title || '视频'
+      const downloadUrl = `${config.baseUrl}/video/download?url=${encodeURIComponent(videoInfo.videoUrl)}&title=${encodeURIComponent(title)}`
+      
       // 复制下载链接到剪贴板
-      await util.copyToClipboard(videoInfo.videoUrl)
+      await util.copyToClipboard(downloadUrl)
       util.hideLoading()
       
       // 提示用户
       wx.showModal({
         title: '下载提示',
-        content: '视频下载链接已复制到剪贴板，请在浏览器中打开链接进行下载。',
+        content: '视频下载链接已复制到剪贴板，请在浏览器中打开链接，浏览器将自动下载视频。',
         showCancel: false,
         confirmText: '知道了'
       })

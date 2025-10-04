@@ -254,11 +254,13 @@ async function startServer() {
     
     // 启动HTTP服务器
     const PORT = process.env.PORT || 3000;
-    const server = app.listen(PORT, () => {
+    const HOST = process.env.HOST || '0.0.0.0';
+    const server = app.listen(PORT, HOST, () => {
       logger.info(`服务器启动成功! 端口: ${PORT}`);
+      logger.info(`监听地址: ${HOST}`);
       logger.info(`环境: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`API地址: http://localhost:${PORT}/api`);
-      logger.info(`健康检查: http://localhost:${PORT}/api/video/health`);
+      logger.info(`API地址: http://${HOST}:${PORT}/api`);
+      logger.info(`健康检查: http://${HOST}:${PORT}/api/video/health`);
       
       if (skipDatabase || process.env.SKIP_DATABASE === 'true') {
         logger.warn('⚠️  当前运行在无数据库模式下');

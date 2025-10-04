@@ -15,4 +15,7 @@ router.get('/platforms', videoController.getSupportedPlatforms);
 // GET /api/video/health - 健康检查
 router.get('/health', videoController.healthCheck);
 
+// GET /api/video/download - 视频下载代理
+router.get('/download', videoController.downloadVideo);
+
 module.exports = router; 

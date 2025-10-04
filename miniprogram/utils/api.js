@@ -24,26 +24,17 @@ const getConfig = () => {
     const systemInfo = wx.getSystemInfoSync()
     const isSimulator = systemInfo.platform === 'devtools'
     
-    if (isSimulator) {
-      // 开发工具环境 - 使用 127.0.0.1 而不是 localhost
-      return {
-        baseUrl: 'http://127.0.0.1:3000/api',
-        debug: true,
-        timeout: 10000
-      }
-    } else {
-      // 真机调试环境 - 请修改下面的IP地址为您的电脑IP
-      return {
-        baseUrl: 'http://192.168.1.5:3000/api', // 电脑局域网IP地址
-        debug: true,
-        timeout: 15000
-      }
+    // 统一使用 Sealos 公网地址（开发工具和真机都可访问）
+    return {
+      baseUrl: 'https://jzhtreabislo.sealosbja.site/api',
+      debug: true,
+      timeout: 15000
     }
   } catch (error) {
     console.error('获取环境配置失败:', error)
     // 默认配置
     return {
-      baseUrl: 'http://localhost:3000/api',
+      baseUrl: 'https://jzhtreabislo.sealosbja.site/api',
       debug: true,
       timeout: 10000
     }
@@ -252,5 +243,7 @@ module.exports = {
   // 登录相关
   wxLogin,
   getUserInfo,
-  refreshToken
+  refreshToken,
+  // 配置
+  getConfig
 } 

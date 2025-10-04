@@ -1,6 +1,7 @@
 const videoService = require('../services/videoService');
 const VideoValidator = require('../validators/videoValidator');
 const { logger } = require('../config/logger');
+const axios = require('axios');
 
 /**
  * 视频解析控制器
@@ -182,6 +183,91 @@ class VideoController {
         exec_time: (Date.now() - startTime) / 1000,
         user_ip: clientIp
       });
+    }
+  }
+  
+  /**
+   * 视频下载代理
+   * 添加 Content-Disposition 响应头，强制浏览器下载而不是播放
+   * @param {Object} req - 请求对象
+   * @param {Object} res - 响应对象
+   */
+  async downloadVideo(req, res) {
+    const clientIp = req.ip || req.connection.remoteAddress;
+    
+    try {
+      // 获取视频URL参数
+      const { url, title } = req.query;
+      
+      if (!url) {
+        return res.status(400).json({
+          code: 400,
+          msg: '缺少url参数',
+          data: null
+        });
+      }
+      
+      logger.info(`视频下载请求: ${url}`, { clientIp });
+      
+      // 生成文件名
+      const timestamp = Date.now();
+      const filename = title 
+        ? `${title.substring(0, 50)}_${timestamp}.mp4`
+        : `video_${timestamp}.mp4`;
+      
+      // 从源服务器获取视频流
+      const response = await axios({
+        method: 'GET',
+        url: url,
+        responseType: 'stream',
+        timeout: 60000, // 60秒超时
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      // 设置响应头，强制下载
+      // 使用 application/octet-stream 强制浏览器下载而不是预览
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader('Content-Transfer-Encoding', 'binary');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      // 如果源服务器提供了文件大小，也传递给客户端
+      if (response.headers['content-length']) {
+        res.setHeader('Content-Length', response.headers['content-length']);
+      }
+      
+      // 将视频流转发给客户端
+      response.data.pipe(res);
+      
+      // 处理流错误
+      response.data.on('error', (error) => {
+        logger.error('视频流传输错误:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            code: 500,
+            msg: '视频下载失败',
+            data: null
+          });
+        }
+      });
+      
+      logger.info('视频下载完成', { clientIp, filename });
+      
+    } catch (error) {
+      logger.error('视频下载代理错误:', error);
+      
+      if (!res.headersSent) {
+        return res.status(500).json({
+          code: 500,
+          msg: '视频下载失败',
+          data: null,
+          debug: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+      }
     }
   }
 }
