@@ -242,29 +242,32 @@
 
 .tips-text {
   font-size: 30rpx;
-  color: #666;
+  color: #333;
+  font-weight: 500;
   line-height: 1.6;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.tips-note {
+  font-size: 26rpx;
+  color: #999;
+  line-height: 1.5;
+  display: block;
 }
 
 .login-footer {
-  flex-direction: column;
+  display: flex;
   gap: 16rpx;
 }
 
 .simple-login-btn {
-  background: linear-gradient(135deg, #34c759 0%, #30d158 100%);
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
   color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.3);
 }
 
 .simple-login-btn:active {
   opacity: 0.8;
-}
-
-.phone-login-btn {
-  background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
-  color: #fff;
-}
-
-.phone-login-btn:active {
-  opacity: 0.8;
+  transform: scale(0.98);
 } 
