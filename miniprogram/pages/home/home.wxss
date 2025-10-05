@@ -74,15 +74,16 @@
   color: #333;
   line-height: 1.4;
   white-space: nowrap;
-  /* 默认不播放动画 */
-  animation: none;
-  transform: translateX(0);
+  /* 默认隐藏在右侧外面 */
+  transform: translateX(100%);
+  opacity: 0;
 }
 
 /* 当前显示的公告才播放滚动动画 */
 .announcement-item.announcement-scroll-active {
   animation: scroll-announcement 10s linear;
   animation-fill-mode: forwards;
+  opacity: 1;
 }
 
 /* 横向滚动动画 - 从右向左完整滚动，无停顿 */
