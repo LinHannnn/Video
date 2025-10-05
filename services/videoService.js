@@ -320,6 +320,13 @@ class VideoService {
         processedData.duration = apiResponse.duration;
       }
       
+      // 提取视频大小（支持多种字段格式）
+      const size = apiResponse.size || apiResponse.filesize || apiResponse.file_size || apiResponse.data?.size;
+      if (size) {
+        // 格式化视频大小
+        processedData.size = this.formatFileSize(size);
+      }
+      
       const videoUrl = apiResponse.video_url || apiResponse.url || apiResponse.data?.work_url;
       if (videoUrl) {
         processedData.videoUrl = videoUrl;
@@ -374,6 +381,34 @@ class VideoService {
     }
     
     return '未知平台';
+  }
+  
+  /**
+   * 格式化文件大小
+   * @param {number|string} size - 文件大小（字节数或已格式化的字符串）
+   * @returns {string} 格式化后的大小字符串（如 "89.01MB"）
+   */
+  formatFileSize(size) {
+    // 如果已经是格式化的字符串，直接返回
+    if (typeof size === 'string') {
+      // 如果已经包含MB或KB等单位，直接返回
+      if (size.match(/\d+(\.\d+)?\s*(MB|KB|GB|B)/i)) {
+        return size;
+      }
+      // 尝试转换为数字
+      size = parseFloat(size);
+      if (isNaN(size)) {
+        return size; // 如果无法转换，返回原字符串
+      }
+    }
+    
+    // 如果是数字，转换为MB
+    if (typeof size === 'number') {
+      const sizeInMB = size / (1024 * 1024);
+      return `${sizeInMB.toFixed(2)}MB`;
+    }
+    
+    return '未知';
   }
   
   /**
