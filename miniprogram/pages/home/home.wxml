@@ -8,7 +8,7 @@
       vertical="true" 
       autoplay="true" 
       circular="true" 
-      interval="12000" 
+      interval="10000" 
       duration="500"
       current="{{currentAnnouncementIndex}}"
       bindchange="onAnnouncementChange"

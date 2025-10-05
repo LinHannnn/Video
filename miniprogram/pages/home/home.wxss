@@ -81,20 +81,15 @@
 
 /* 当前显示的公告才播放滚动动画 */
 .announcement-item.announcement-scroll-active {
-  animation: scroll-announcement 12s ease-in-out;
+  animation: scroll-announcement 10s linear;
   animation-fill-mode: forwards;
 }
 
-/* 横向滚动动画 - 从右向左完整滚动后停留 */
+/* 横向滚动动画 - 从右向左完整滚动，无停顿 */
 @keyframes scroll-announcement {
   0% {
     transform: translateX(100%);
   }
-  /* 70%的时间用于滚动（约8.4秒） */
-  70% {
-    transform: translateX(-100%);
-  }
-  /* 30%的时间停留在左侧（约3.6秒） */
   100% {
     transform: translateX(-100%);
   }
