@@ -26,7 +26,7 @@ const getConfig = () => {
     
     // 统一使用 Sealos 公网地址（开发工具和真机都可访问）
     return {
-      baseUrl: 'https://jzhtreabislo.sealosbja.site/api',
+      baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api',
       debug: true,
       timeout: 15000
     }
@@ -34,7 +34,7 @@ const getConfig = () => {
     console.error('获取环境配置失败:', error)
     // 默认配置
     return {
-      baseUrl: 'https://jzhtreabislo.sealosbja.site/api',
+      baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api',
       debug: true,
       timeout: 10000
     }

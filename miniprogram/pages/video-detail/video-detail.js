@@ -73,7 +73,7 @@ Page({
       
       // 构建下载代理链接
       const api = require('../../utils/api.js')
-      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://jzhtreabislo.sealosbja.site/api' }
+      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api' }
       const title = videoInfo.title || videoInfo.work_title || '视频'
       const downloadUrl = `${config.baseUrl}/video/download?url=${encodeURIComponent(videoInfo.videoUrl)}&title=${encodeURIComponent(title)}`
       
