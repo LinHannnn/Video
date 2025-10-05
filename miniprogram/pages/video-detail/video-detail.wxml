@@ -43,7 +43,7 @@
       bindtap="onCopyVideoUrl"
       hover-class="btn-hover"
     >
-      复制视频链接
+      复制视频下载链接
     </button>
     
     <button 

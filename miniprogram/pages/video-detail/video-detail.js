@@ -271,7 +271,7 @@ Page({
     })
   },
 
-  // 复制视频链接
+  // 复制视频下载链接
   async onCopyVideoUrl() {
     const videoInfo = this.data.videoInfo
     if (!videoInfo || !videoInfo.videoUrl) {
@@ -280,10 +280,21 @@ Page({
     }
 
     try {
+      // 复制视频下载链接
       await util.copyToClipboard(videoInfo.videoUrl)
+      
+      // 显示提示信息
+      wx.showModal({
+        title: '复制成功',
+        content: '下载链接已复制到剪贴板，请粘贴至浏览器进行下载',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+      
+      console.log('✅ 视频下载链接已复制:', videoInfo.videoUrl)
     } catch (error) {
       util.showToast('复制失败')
-      console.error('复制失败:', error)
+      console.error('❌ 复制失败:', error)
     }
   },
 
