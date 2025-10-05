@@ -1,0 +1,676 @@
+openapi: 3.0.3
+info:
+  title: 公告管理 API
+  description: |
+    公告管理系统接口文档，提供公告的创建、查询、更新、删除等功能。
+    
+    ## 功能特性
+    - 动态加载公告内容
+    - 支持无限长度的公告文本
+    - 优先级排序
+    - 时间控制（开始/结束时间）
+    - 状态管理（启用/禁用）
+    - 批量操作
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:3000/api
+    description: 本地开发环境
+  - url: https://your-domain.com/api
+    description: 生产环境
+
+tags:
+  - name: 公告-公开接口
+    description: 面向小程序端的公开接口
+  - name: 公告-管理接口
+    description: 面向管理端的接口，用于公告的增删改查
+
+paths:
+  /announcements/active:
+    get:
+      tags:
+        - 公告-公开接口
+      summary: 获取有效公告
+      description: |
+        获取当前有效的公告列表，用于小程序首页显示。
+        
+        自动过滤条件：
+        - status = 1（启用状态）
+        - 当前时间在 start_time 和 end_time 之间（如果设置了时间）
+        
+        结果按优先级降序、创建时间降序排列。
+        
+      operationId: getActiveAnnouncements
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnnouncementPublic'
+              examples:
+                success:
+                  summary: 成功响应示例
+                  value:
+                    code: 200
+                    msg: 获取成功
+                    data:
+                      - id: 1
+                        content: 欢迎使用视频解析小程序！
+                        priority: 100
+                        start_time: null
+                        end_time: null
+                      - id: 2
+                        content: 系统将于今晚22:00-23:00进行维护
+                        priority: 90
+                        start_time: "2025-10-05T00:00:00.000Z"
+                        end_time: "2025-10-06T00:00:00.000Z"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /announcements:
+    get:
+      tags:
+        - 公告-管理接口
+      summary: 获取所有公告（分页）
+      description: |
+        获取所有公告列表，支持分页和状态筛选。
+        管理端使用，可查看包括禁用状态的所有公告。
+        
+      operationId: getAllAnnouncements
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            example: 10
+        - name: status
+          in: query
+          description: 公告状态（0-禁用，1-启用）
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            example: 1
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: object
+                    properties:
+                      list:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AnnouncementFull'
+                      total:
+                        type: integer
+                        description: 总记录数
+                        example: 25
+                      page:
+                        type: integer
+                        description: 当前页码
+                        example: 1
+                      limit:
+                        type: integer
+                        description: 每页数量
+                        example: 10
+              examples:
+                success:
+                  summary: 成功响应示例
+                  value:
+                    code: 200
+                    msg: 获取成功
+                    data:
+                      list:
+                        - id: 1
+                          content: 欢迎使用视频解析小程序！
+                          status: 1
+                          priority: 100
+                          start_time: null
+                          end_time: null
+                          created_by: admin
+                          created_at: "2025-10-01T10:00:00.000Z"
+                          updated_at: "2025-10-01T10:00:00.000Z"
+                        - id: 2
+                          content: 系统维护通知
+                          status: 0
+                          priority: 50
+                          start_time: "2025-10-05T00:00:00.000Z"
+                          end_time: "2025-10-06T00:00:00.000Z"
+                          created_by: admin
+                          created_at: "2025-10-02T14:30:00.000Z"
+                          updated_at: "2025-10-02T14:30:00.000Z"
+                      total: 25
+                      page: 1
+                      limit: 10
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    post:
+      tags:
+        - 公告-管理接口
+      summary: 创建新公告
+      description: |
+        创建一条新的公告。
+        
+        字段说明：
+        - content: 公告内容，必填
+        - status: 状态（0-禁用，1-启用），默认为 1
+        - priority: 优先级，默认为 0，数值越大优先级越高
+        - start_time: 开始时间，可选，格式 ISO 8601
+        - end_time: 结束时间，可选，格式 ISO 8601
+        - created_by: 创建者，可选
+        
+      operationId: createAnnouncement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementCreate'
+            examples:
+              basic:
+                summary: 基本公告
+                value:
+                  content: 欢迎使用本系统！
+                  status: 1
+                  priority: 50
+              timed:
+                summary: 限时公告
+                value:
+                  content: 系统将于今晚进行维护
+                  status: 1
+                  priority: 90
+                  start_time: "2025-10-05T00:00:00Z"
+                  end_time: "2025-10-06T00:00:00Z"
+                  created_by: admin
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 创建成功
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: 新创建的公告ID
+                        example: 15
+              examples:
+                success:
+                  value:
+                    code: 200
+                    msg: 创建成功
+                    data:
+                      id: 15
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyContent:
+                  summary: 公告内容为空
+                  value:
+                    code: 400
+                    msg: 公告内容不能为空
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /announcements/{id}:
+    put:
+      tags:
+        - 公告-管理接口
+      summary: 更新公告
+      description: |
+        更新指定ID的公告信息。
+        
+        可更新字段：
+        - content: 公告内容
+        - status: 状态（0-禁用，1-启用）
+        - priority: 优先级
+        - start_time: 开始时间
+        - end_time: 结束时间
+        
+        只需传入需要更新的字段即可。
+        
+      operationId: updateAnnouncement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 公告ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementUpdate'
+            examples:
+              updateStatus:
+                summary: 更新状态
+                value:
+                  status: 0
+              updateContent:
+                summary: 更新内容
+                value:
+                  content: 更新后的公告内容
+                  priority: 80
+              updateTime:
+                summary: 更新时间范围
+                value:
+                  start_time: "2025-10-10T00:00:00Z"
+                  end_time: "2025-10-15T23:59:59Z"
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 更新成功
+              examples:
+                success:
+                  value:
+                    code: 200
+                    msg: 更新成功
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noUpdate:
+                  summary: 没有要更新的内容
+                  value:
+                    code: 400
+                    msg: 没有要更新的内容
+        '404':
+          description: 公告不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    code: 404
+                    msg: 公告不存在
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    delete:
+      tags:
+        - 公告-管理接口
+      summary: 删除公告
+      description: 删除指定ID的公告
+      operationId: deleteAnnouncement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 公告ID
+          schema:
+            type: integer
+            example: 3
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 删除成功
+              examples:
+                success:
+                  value:
+                    code: 200
+                    msg: 删除成功
+        '404':
+          description: 公告不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    code: 404
+                    msg: 公告不存在
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /announcements/batch/status:
+    post:
+      tags:
+        - 公告-管理接口
+      summary: 批量更新公告状态
+      description: |
+        批量更新多个公告的状态。
+        
+        可用于批量启用或禁用多个公告。
+        
+      operationId: batchUpdateStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+                - status
+              properties:
+                ids:
+                  type: array
+                  description: 公告ID数组
+                  items:
+                    type: integer
+                  minItems: 1
+                  example: [1, 2, 3]
+                status:
+                  type: integer
+                  description: 目标状态（0-禁用，1-启用）
+                  enum: [0, 1]
+                  example: 0
+            examples:
+              disable:
+                summary: 批量禁用
+                value:
+                  ids: [1, 2, 3]
+                  status: 0
+              enable:
+                summary: 批量启用
+                value:
+                  ids: [4, 5, 6]
+                  status: 1
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  msg:
+                    type: string
+                    example: 更新成功
+                  data:
+                    type: object
+                    properties:
+                      affectedRows:
+                        type: integer
+                        description: 影响的行数
+                        example: 3
+              examples:
+                success:
+                  value:
+                    code: 200
+                    msg: 更新成功
+                    data:
+                      affectedRows: 3
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyIds:
+                  summary: IDs数组为空
+                  value:
+                    code: 400
+                    msg: ids 必须是非空数组
+                invalidStatus:
+                  summary: 状态值无效
+                  value:
+                    code: 400
+                    msg: status 必须是 0 或 1
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    AnnouncementPublic:
+      type: object
+      description: 公开接口返回的公告对象（精简版）
+      properties:
+        id:
+          type: integer
+          description: 公告ID
+          example: 1
+        content:
+          type: string
+          description: 公告内容
+          example: 欢迎使用视频解析小程序！
+        priority:
+          type: integer
+          description: 优先级（数值越大优先级越高）
+          example: 100
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 开始时间
+          example: null
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 结束时间
+          example: null
+    
+    AnnouncementFull:
+      type: object
+      description: 完整的公告对象（管理端）
+      properties:
+        id:
+          type: integer
+          description: 公告ID
+          example: 1
+        content:
+          type: string
+          description: 公告内容
+          example: 欢迎使用视频解析小程序！
+        status:
+          type: integer
+          description: 状态（0-禁用，1-启用）
+          enum: [0, 1]
+          example: 1
+        priority:
+          type: integer
+          description: 优先级（数值越大优先级越高）
+          example: 100
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 开始时间
+          example: null
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 结束时间
+          example: null
+        created_by:
+          type: string
+          nullable: true
+          description: 创建者
+          example: admin
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-10-01T10:00:00.000Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-10-01T10:00:00.000Z"
+    
+    AnnouncementCreate:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          description: 公告内容（必填）
+          example: 欢迎使用本系统！
+        status:
+          type: integer
+          description: 状态（0-禁用，1-启用）
+          enum: [0, 1]
+          default: 1
+          example: 1
+        priority:
+          type: integer
+          description: 优先级（数值越大优先级越高）
+          default: 0
+          example: 50
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 开始时间（可选）
+          example: "2025-10-05T00:00:00Z"
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 结束时间（可选）
+          example: "2025-10-06T00:00:00Z"
+        created_by:
+          type: string
+          nullable: true
+          description: 创建者（可选）
+          example: admin
+    
+    AnnouncementUpdate:
+      type: object
+      description: 更新公告时的请求体（所有字段都是可选的）
+      properties:
+        content:
+          type: string
+          description: 公告内容
+          example: 更新后的公告内容
+        status:
+          type: integer
+          description: 状态（0-禁用，1-启用）
+          enum: [0, 1]
+          example: 0
+        priority:
+          type: integer
+          description: 优先级
+          example: 80
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 开始时间
+          example: "2025-10-10T00:00:00Z"
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: 结束时间
+          example: "2025-10-15T23:59:59Z"
+    
+    ErrorResponse:
+      type: object
+      description: 错误响应
+      properties:
+        code:
+          type: integer
+          description: 错误码
+          example: 400
+        msg:
+          type: string
+          description: 错误信息
+          example: 请求参数错误
+        error:
+          type: string
+          description: 详细错误信息（可选）
+          example: Invalid parameter
+  
+  responses:
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            serverError:
+              value:
+                code: 500
+                msg: 服务器内部错误
+                error: Database connection failed
