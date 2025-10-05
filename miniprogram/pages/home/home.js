@@ -26,6 +26,20 @@ Page({
   onShow() {
     // 页面显示时重新检查剪贴板
     this.checkClipboard()
+    
+    // 重置公告动画状态，解决从其他页面返回时动画不显示的问题
+    // 每次返回首页时从第一条公告重新开始
+    if (this.data.announcements.length > 0) {
+      // 先清空，然后重置为0，触发动画重新播放
+      this.setData({
+        currentAnnouncementIndex: -1
+      })
+      setTimeout(() => {
+        this.setData({
+          currentAnnouncementIndex: 0
+        })
+      }, 50)
+    }
   },
 
   // 检查剪贴板内容
