@@ -292,27 +292,14 @@ Page({
             // 用户曾经拒绝过，需要引导用户打开设置
             wx.showModal({
               title: '需要相册权限',
-              content: '需要您授权保存图片到相册的权限，请在设置中开启',
-              confirmText: '去设置',
+              content: '保存视频需要相册权限。请点击右上角"..."，选择"设置"，然后开启"保存到相册"权限。',
+              showCancel: true,
+              cancelText: '取消',
+              confirmText: '知道了',
               success: (modalRes) => {
-                if (modalRes.confirm) {
-                  wx.openSetting({
-                    success: (settingRes) => {
-                      if (settingRes.authSetting['scope.writePhotosAlbum']) {
-                        console.log('✅ 用户已在设置中授权')
-                        resolve(true)
-                      } else {
-                        console.log('❌ 用户拒绝授权')
-                        resolve(false)
-                      }
-                    },
-                    fail: () => {
-                      resolve(false)
-                    }
-                  })
-                } else {
-                  resolve(false)
-                }
+                // 不再自动打开设置，避免小程序重启
+                // 用户可以手动去设置
+                resolve(false)
               }
             })
           } else {
