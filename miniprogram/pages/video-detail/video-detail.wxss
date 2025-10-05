@@ -110,6 +110,20 @@
   background: #fff;
 }
 
+.video-size-loading {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #999;
+  padding: 6rpx 12rpx;
+  align-self: flex-end;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .video-meta {
   display: flex;
   gap: 24rpx;

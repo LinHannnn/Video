@@ -6,7 +6,9 @@ Page({
     videoInfo: null,
     showVideoPlayer: false,
     isDownloading: false,
-    downloadProgress: 0
+    downloadProgress: 0,
+    coverImageUrl: '', // 封面图片URL
+    isFetchingSize: false // 是否正在获取视频大小
   },
 
   onLoad(options) {
@@ -33,8 +35,13 @@ Page({
     // 格式化视频大小
     if (videoInfo) {
       videoInfo = this.formatVideoSize(videoInfo)
+      
+      // 设置封面图片（使用默认占位图）
+      const coverUrl = videoInfo.coverImage || videoInfo.coverUrl || '/images/video-placeholder.png'
+      
       this.setData({
-        videoInfo: videoInfo
+        videoInfo: videoInfo,
+        coverImageUrl: coverUrl
       })
     }
   },
@@ -73,13 +80,18 @@ Page({
     }
   },
 
-  // 获取视频文件大小（通过后端代理）
+  // 获取视频文件大小（通过后端代理，优化版）
   async fetchVideoSize() {
     try {
       const videoInfo = this.data.videoInfo
       if (!videoInfo || !videoInfo.videoUrl) {
         return
       }
+
+      // 设置加载状态
+      this.setData({
+        isFetchingSize: true
+      })
 
       console.log('🔍 尝试获取视频文件大小...')
 
@@ -95,6 +107,7 @@ Page({
       wx.request({
         url: proxyUrl,
         method: 'HEAD',
+        timeout: 10000, // 10秒超时
         success: (res) => {
           const contentLength = res.header['Content-Length'] || res.header['content-length']
           
@@ -111,7 +124,8 @@ Page({
             }
             
             this.setData({
-              videoInfo: updatedVideoInfo
+              videoInfo: updatedVideoInfo,
+              isFetchingSize: false
             })
             
             // 同时更新全局数据
@@ -119,16 +133,33 @@ Page({
             app.globalData.currentVideoInfo = updatedVideoInfo
           } else {
             console.log('⚠️ 无法获取视频大小：响应头中没有 Content-Length')
+            this.setData({
+              isFetchingSize: false
+            })
           }
         },
         fail: (error) => {
           console.log('⚠️ 获取视频大小失败:', error)
-          // 失败不影响其他功能，静默处理
+          this.setData({
+            isFetchingSize: false
+          })
         }
       })
     } catch (error) {
       console.error('❌ 获取视频大小出错:', error)
+      this.setData({
+        isFetchingSize: false
+      })
     }
+  },
+
+  // 图片加载失败处理
+  onImageError(e) {
+    console.log('❌ 封面图片加载失败:', e.detail)
+    // 使用灰色占位背景
+    this.setData({
+      coverImageUrl: '/images/video-placeholder.png'
+    })
   },
 
   // 播放视频

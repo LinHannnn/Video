@@ -13,9 +13,11 @@
       <!-- 视频封面或播放器 -->
       <image 
         class="video-cover" 
-        src="{{videoInfo.coverImage || videoInfo.coverUrl}}" 
+        src="{{coverImageUrl}}" 
         mode="aspectFill"
         bindtap="onPlayVideo"
+        binderror="onImageError"
+        show-menu-by-longpress="{{false}}"
       />
       
       <!-- 播放按钮覆盖层 -->
@@ -30,6 +32,7 @@
         <view class="video-title-row">
           <text class="video-title">{{videoInfo.title || videoInfo.work_title || '无标题'}}</text>
           <text class="video-size" wx:if="{{videoInfo.size}}">视频大小: {{videoInfo.size}}</text>
+          <text class="video-size-loading" wx:elif="{{isFetchingSize}}">获取大小中...</text>
         </view>
       </view>
     </view>
