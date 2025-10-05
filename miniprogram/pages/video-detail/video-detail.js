@@ -178,11 +178,19 @@ Page({
         mask: true
       })
 
-      console.log('📥 开始下载视频:', videoInfo.videoUrl)
+      // 3. 构建代理下载链接（通过后端服务器下载，避免域名限制）
+      const api = require('../../utils/api.js')
+      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api' }
+      const title = videoInfo.title || videoInfo.work_title || '视频'
+      
+      // 使用后端的下载代理接口
+      const proxyDownloadUrl = `${config.baseUrl}/video/download?url=${encodeURIComponent(videoInfo.videoUrl)}&title=${encodeURIComponent(title)}`
+      
+      console.log('📥 开始下载视频（通过代理）:', proxyDownloadUrl)
 
-      // 3. 使用 downloadFile 下载视频
+      // 4. 使用 downloadFile 下载视频（通过代理）
       const downloadTask = wx.downloadFile({
-        url: videoInfo.videoUrl,
+        url: proxyDownloadUrl,
         success: async (res) => {
           wx.hideLoading()
           
