@@ -66,6 +66,61 @@ Page({
     wx.setNavigationBarTitle({
       title: '视频解析结果'
     })
+    
+    // 如果没有视频大小，尝试获取
+    if (this.data.videoInfo && !this.data.videoInfo.size && this.data.videoInfo.videoUrl) {
+      this.fetchVideoSize()
+    }
+  },
+
+  // 获取视频文件大小
+  async fetchVideoSize() {
+    try {
+      const videoInfo = this.data.videoInfo
+      if (!videoInfo || !videoInfo.videoUrl) {
+        return
+      }
+
+      console.log('🔍 尝试获取视频文件大小...')
+
+      // 使用 HEAD 请求获取文件大小（不下载文件内容）
+      wx.request({
+        url: videoInfo.videoUrl,
+        method: 'HEAD',
+        success: (res) => {
+          const contentLength = res.header['Content-Length'] || res.header['content-length']
+          
+          if (contentLength) {
+            const sizeInBytes = parseInt(contentLength)
+            const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2)
+            
+            console.log(`✅ 获取到视频大小: ${sizeInMB}MB (${sizeInBytes} bytes)`)
+            
+            // 更新视频信息
+            const updatedVideoInfo = {
+              ...this.data.videoInfo,
+              size: `${sizeInMB}MB`
+            }
+            
+            this.setData({
+              videoInfo: updatedVideoInfo
+            })
+            
+            // 同时更新全局数据
+            const app = getApp()
+            app.globalData.currentVideoInfo = updatedVideoInfo
+          } else {
+            console.log('⚠️ 无法获取视频大小：响应头中没有 Content-Length')
+          }
+        },
+        fail: (error) => {
+          console.log('⚠️ 获取视频大小失败:', error)
+          // 失败不影响其他功能，静默处理
+        }
+      })
+    } catch (error) {
+      console.error('❌ 获取视频大小出错:', error)
+    }
   },
 
   // 播放视频
