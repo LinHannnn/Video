@@ -73,7 +73,7 @@ Page({
     }
   },
 
-  // 获取视频文件大小
+  // 获取视频文件大小（通过后端代理）
   async fetchVideoSize() {
     try {
       const videoInfo = this.data.videoInfo
@@ -83,9 +83,17 @@ Page({
 
       console.log('🔍 尝试获取视频文件大小...')
 
+      // 构建代理请求URL（通过后端获取，避免域名限制）
+      const api = require('../../utils/api.js')
+      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api' }
+      const title = videoInfo.title || videoInfo.work_title || '视频'
+      
+      // 使用后端的下载代理接口（HEAD 请求获取文件大小）
+      const proxyUrl = `${config.baseUrl}/video/download?url=${encodeURIComponent(videoInfo.videoUrl)}&title=${encodeURIComponent(title)}`
+
       // 使用 HEAD 请求获取文件大小（不下载文件内容）
       wx.request({
-        url: videoInfo.videoUrl,
+        url: proxyUrl,
         method: 'HEAD',
         success: (res) => {
           const contentLength = res.header['Content-Length'] || res.header['content-length']
