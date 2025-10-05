@@ -197,13 +197,17 @@ Page({
       console.log('📥 开始下载视频（通过代理）:', proxyDownloadUrl)
 
       // 4. 使用 downloadFile 下载视频（通过代理）
+      // 指定文件路径为.mp4格式，避免保存到相册时文件类型错误
       const downloadTask = wx.downloadFile({
         url: proxyDownloadUrl,
+        filePath: `${wx.env.USER_DATA_PATH}/video_${Date.now()}.mp4`,
         success: async (res) => {
           wx.hideLoading()
           
           if (res.statusCode === 200) {
-            console.log('✅ 视频下载成功，临时文件路径:', res.tempFilePath)
+            // 使用指定的filePath（.mp4格式）
+            const videoPath = res.filePath || res.tempFilePath
+            console.log('✅ 视频下载成功，文件路径:', videoPath)
             
             // 4. 保存到相册
             try {
@@ -212,7 +216,7 @@ Page({
                 mask: true
               })
 
-              await this.saveVideoToPhotosAlbum(res.tempFilePath)
+              await this.saveVideoToPhotosAlbum(videoPath)
               
               wx.hideLoading()
               
