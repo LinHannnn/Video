@@ -12,6 +12,11 @@
     "navigationBarTextStyle": "black",
     "backgroundColor": "#f8f8f8"
   },
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "需要您的授权才能保存视频到相册"
+    }
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"
