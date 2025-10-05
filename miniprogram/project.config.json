@@ -5,6 +5,22 @@
       {
         "value": ".eslintrc.js",
         "type": "file"
+      },
+      {
+        "value": "**/*.md",
+        "type": "glob"
+      },
+      {
+        "value": "**/*.txt",
+        "type": "glob"
+      },
+      {
+        "value": "**/README*",
+        "type": "glob"
+      },
+      {
+        "value": "**/.DS_Store",
+        "type": "glob"
       }
     ],
     "include": []
