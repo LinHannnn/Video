@@ -306,12 +306,12 @@ class VideoService {
       }
       
       // 支持多种字段格式（第三方API可能返回不同的字段名）
-      const title = apiResponse.title || apiResponse.data?.work_title;
+      const title = apiResponse.title || apiResponse.work_title || apiResponse.data?.work_title;
       if (title) {
         processedData.title = title;
       }
       
-      const author = apiResponse.author || apiResponse.data?.work_author;
+      const author = apiResponse.author || apiResponse.work_author || apiResponse.data?.work_author;
       if (author) {
         processedData.author = author;
       }
@@ -327,22 +327,22 @@ class VideoService {
         processedData.size = this.formatFileSize(size);
       }
       
-      const videoUrl = apiResponse.video_url || apiResponse.url || apiResponse.data?.work_url;
+      const videoUrl = apiResponse.video_url || apiResponse.url || apiResponse.work_url || apiResponse.data?.work_url;
       if (videoUrl) {
         processedData.videoUrl = videoUrl;
       }
       
-      const coverImage = apiResponse.cover || apiResponse.pic || apiResponse.data?.work_cover;
+      const coverImage = apiResponse.cover || apiResponse.pic || apiResponse.work_cover || apiResponse.data?.work_cover;
       if (coverImage) {
         processedData.coverImage = coverImage;
       }
       
-      const description = apiResponse.description || apiResponse.desc || apiResponse.data?.work_desc;
+      const description = apiResponse.description || apiResponse.desc || apiResponse.work_desc || apiResponse.data?.work_desc;
       if (description) {
         processedData.description = description;
       }
       
-      const workType = apiResponse.data?.work_type;
+      const workType = apiResponse.work_type || apiResponse.data?.work_type;
       if (workType) {
         processedData.type = workType;
       }
