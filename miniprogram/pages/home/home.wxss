@@ -57,17 +57,47 @@
   height: 120rpx;
 }
 
-.announcement-item {
+.announcement-item-wrapper {
   width: 100%;
   height: 120rpx;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.announcement-item {
+  height: 120rpx;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.announcement-text {
+  display: inline-block;
   font-size: 28rpx;
   color: #333;
   line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding-right: 80rpx;
+}
+
+/* 复制的文本，用于无缝循环 */
+.announcement-text-copy {
+  padding-left: 0;
+}
+
+/* 横向滚动动画 - 无缝循环 */
+.announcement-scroll {
+  animation: scroll-left 20s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* 输入区域 */

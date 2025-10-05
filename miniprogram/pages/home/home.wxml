@@ -8,12 +8,17 @@
       vertical="true" 
       autoplay="true" 
       circular="true" 
-      interval="3000" 
+      interval="5000" 
       duration="500"
     >
       <block wx:for="{{announcements}}" wx:key="id">
         <swiper-item>
-          <view class="announcement-item">{{item.content}}</view>
+          <view class="announcement-item-wrapper">
+            <view class="announcement-item announcement-scroll">
+              <text class="announcement-text">{{item.content}}</text>
+              <text class="announcement-text announcement-text-copy">{{item.content}}</text>
+            </view>
+          </view>
         </swiper-item>
       </block>
     </swiper>
