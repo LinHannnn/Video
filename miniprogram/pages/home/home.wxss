@@ -86,17 +86,26 @@
   padding-left: 0;
 }
 
-/* 单条公告横向滚动动画 - 循环移动 */
+/* 单条公告横向滚动动画 - 循环移动（内容完整展示后暂停再循环） */
 .announcement-scroll-single {
-  animation: scroll-single 12s linear infinite;
+  animation: scroll-single 15s ease-in-out infinite;
 }
 
 @keyframes scroll-single {
   0% {
     transform: translateX(100%);
   }
-  100% {
+  /* 滚动到左侧，内容完整展示 */
+  70% {
     transform: translateX(-100%);
+  }
+  /* 暂停一段时间 */
+  85% {
+    transform: translateX(-100%);
+  }
+  /* 准备下一轮 */
+  100% {
+    transform: translateX(100%);
   }
 }
 

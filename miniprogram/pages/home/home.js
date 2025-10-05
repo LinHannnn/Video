@@ -285,11 +285,13 @@ Page({
     try {
       const result = await api.getAnnouncements()
       if (result.code === 200 && result.data) {
+        // 只保留第一条公告
+        const announcements = result.data.length > 0 ? [result.data[0]] : []
         this.setData({
-          announcements: result.data,
+          announcements: announcements,
           currentAnnouncementIndex: 0
         })
-        console.log('✅ 加载公告成功', result.data.length, '条')
+        console.log('✅ 加载公告成功，显示 1 条公告')
       }
     } catch (error) {
       console.error('❌ 加载公告失败:', error)
