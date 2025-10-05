@@ -12,8 +12,7 @@ Page({
     videoInfo: null,
     loginCode: '', // 保存登录 code
     announcements: [], // 公告列表
-    currentAnnouncementIndex: 0, // 当前公告索引
-    singleAnnouncementAnimation: null // 单条公告的动画对象
+    currentAnnouncementIndex: 0 // 当前公告索引
   },
 
   onLoad() {
@@ -285,13 +284,11 @@ Page({
     try {
       const result = await api.getAnnouncements()
       if (result.code === 200 && result.data) {
-        // 只保留第一条公告
-        const announcements = result.data.length > 0 ? [result.data[0]] : []
         this.setData({
-          announcements: announcements,
+          announcements: result.data,
           currentAnnouncementIndex: 0
         })
-        console.log('✅ 加载公告成功，显示 1 条公告')
+        console.log('✅ 加载公告成功，显示', result.data.length, '条公告')
       }
     } catch (error) {
       console.error('❌ 加载公告失败:', error)
@@ -299,12 +296,12 @@ Page({
     }
   },
 
-  // 公告切换事件
+  // 公告切换事件 - 重置动画
   onAnnouncementChange(e) {
     const { current } = e.detail
-    console.log('📢 公告切换到:', current)
+    console.log('📢 公告切换到第', current + 1, '条')
     
-    // 更新当前索引，触发动画重新开始
+    // 更新当前索引，触发新公告的滚动动画
     this.setData({
       currentAnnouncementIndex: current
     })

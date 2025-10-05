@@ -68,64 +68,35 @@
 
 .announcement-item {
   height: 120rpx;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  white-space: nowrap;
-}
-
-.announcement-text {
-  display: inline-block;
   font-size: 28rpx;
   color: #333;
   line-height: 1.4;
-  padding-right: 80rpx;
+  white-space: nowrap;
+  /* 默认不播放动画 */
+  animation: none;
+  transform: translateX(0);
 }
 
-/* 复制的文本，用于无缝循环 */
-.announcement-text-copy {
-  padding-left: 0;
+/* 当前显示的公告才播放滚动动画 */
+.announcement-item.announcement-scroll-active {
+  animation: scroll-announcement 12s ease-in-out;
+  animation-fill-mode: forwards;
 }
 
-/* 单条公告横向滚动动画 - 循环移动（内容完整展示后暂停再循环） */
-.announcement-scroll-single {
-  animation: scroll-single 15s ease-in-out infinite;
-}
-
-@keyframes scroll-single {
+/* 横向滚动动画 - 从右向左完整滚动后停留 */
+@keyframes scroll-announcement {
   0% {
     transform: translateX(100%);
   }
-  /* 滚动到左侧，内容完整展示 */
+  /* 70%的时间用于滚动（约8.4秒） */
   70% {
     transform: translateX(-100%);
   }
-  /* 暂停一段时间 */
-  85% {
+  /* 30%的时间停留在左侧（约3.6秒） */
+  100% {
     transform: translateX(-100%);
-  }
-  /* 准备下一轮 */
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* 多条公告横向滚动动画 - 无缝循环 */
-.announcement-scroll-multi {
-  /* 默认不播放动画，等待激活 */
-  animation: none;
-}
-
-/* 当前显示的公告才播放动画 */
-.announcement-scroll-multi.active {
-  animation: scroll-left 10s linear infinite;
-}
-
-@keyframes scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
   }
 }
 
