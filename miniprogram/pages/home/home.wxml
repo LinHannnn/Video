@@ -6,6 +6,25 @@
     <text class="subtitle-text">支持主流平台视频无水印下载</text>
   </view>
 
+  <!-- 滚动公告 -->
+  <view wx:if="{{announcements.length > 0}}" class="announcement-section">
+    <view class="announcement-icon">📢</view>
+    <swiper 
+      class="announcement-swiper" 
+      vertical="true" 
+      autoplay="true" 
+      circular="true" 
+      interval="3000" 
+      duration="500"
+    >
+      <block wx:for="{{announcements}}" wx:key="id">
+        <swiper-item>
+          <view class="announcement-item">{{item.content}}</view>
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
   <!-- 输入区域 -->
   <view class="input-section">
     <textarea 

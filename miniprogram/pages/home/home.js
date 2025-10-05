@@ -10,13 +10,16 @@ Page({
     showDisclaimer: false,
     showLoginModal: false,
     videoInfo: null,
-    loginCode: '' // 保存登录 code
+    loginCode: '', // 保存登录 code
+    announcements: [] // 公告列表
   },
 
   onLoad() {
     // 初始化剪贴板提示的锁与上次内容，避免重复弹窗
     this._clipboardPromptLock = false
     this._lastClipboardText = ''
+    // 加载公告
+    this.loadAnnouncements()
   },
 
   onShow() {
@@ -272,6 +275,22 @@ Page({
     return {
       title: '视频提取助手 - 免费视频下载工具',
       imageUrl: '/images/share-cover.png'
+    }
+  },
+
+  // 加载公告
+  async loadAnnouncements() {
+    try {
+      const result = await api.getAnnouncements()
+      if (result.code === 200 && result.data) {
+        this.setData({
+          announcements: result.data
+        })
+        console.log('✅ 加载公告成功', result.data.length, '条')
+      }
+    } catch (error) {
+      console.error('❌ 加载公告失败:', error)
+      // 加载公告失败不影响主要功能，静默处理
     }
   }
 })

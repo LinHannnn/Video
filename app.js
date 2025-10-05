@@ -15,6 +15,7 @@ const { generalLimiter, videoLimiter, adminLimiter } = require('./middleware/rat
 const videoRoutes = require('./routes/videoRoutes');
 const keyRoutes = require('./routes/keyRoutes');
 const authRoutes = require('./routes/authRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
 
 // 创建Express应用
 const app = express();
@@ -53,6 +54,7 @@ app.use('/api/video/parse', videoLimiter); // 视频解析接口专用限制
 app.use('/api/video', videoRoutes);
 app.use('/api/admin/keys', adminLimiter, keyRoutes); // 管理接口专用限制
 app.use('/api/auth', authRoutes); // 用户认证接口
+app.use('/api/announcements', announcementRoutes); // 公告接口
 
 // 根路径
 app.get('/', (req, res) => {

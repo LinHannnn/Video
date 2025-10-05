@@ -235,6 +235,20 @@ const refreshToken = async (refreshToken) => {
   }
 }
 
+// ============ 公告相关接口 ============
+
+// 获取有效公告列表
+const getAnnouncements = async () => {
+  try {
+    return await request('/announcements/active', {
+      method: 'GET'
+    })
+  } catch (error) {
+    console.error('获取公告失败:', error)
+    throw error
+  }
+}
+
 module.exports = {
   parseVideo,
   getSupportedPlatforms,
@@ -244,6 +258,8 @@ module.exports = {
   wxLogin,
   getUserInfo,
   refreshToken,
+  // 公告相关
+  getAnnouncements,
   // 配置
   getConfig
 } 

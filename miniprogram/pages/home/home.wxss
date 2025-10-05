@@ -29,6 +29,45 @@
   line-height: 1.4;
 }
 
+/* 滚动公告 */
+.announcement-section {
+  width: 100%;
+  max-width: 600rpx;
+  height: 70rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.25);
+  overflow: hidden;
+}
+
+.announcement-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.announcement-swiper {
+  flex: 1;
+  height: 70rpx;
+}
+
+.announcement-item {
+  width: 100%;
+  height: 70rpx;
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #fff;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* 输入区域 */
 .input-section {
   width: 100%;
