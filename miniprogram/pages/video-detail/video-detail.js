@@ -12,24 +12,53 @@ Page({
   onLoad(options) {
     // 从页面参数或全局数据中获取视频信息
     const app = getApp()
+    let videoInfo = null
+    
     if (options.videoData) {
       try {
-        const videoInfo = JSON.parse(decodeURIComponent(options.videoData))
-        this.setData({
-          videoInfo: videoInfo
-        })
+        videoInfo = JSON.parse(decodeURIComponent(options.videoData))
       } catch (error) {
         console.error('解析视频数据失败:', error)
         this.goBack()
+        return
       }
     } else if (app.globalData.currentVideoInfo) {
-      this.setData({
-        videoInfo: app.globalData.currentVideoInfo
-      })
+      videoInfo = app.globalData.currentVideoInfo
     } else {
       util.showToast('视频信息不存在')
       this.goBack()
+      return
     }
+
+    // 格式化视频大小
+    if (videoInfo) {
+      videoInfo = this.formatVideoSize(videoInfo)
+      this.setData({
+        videoInfo: videoInfo
+      })
+    }
+  },
+
+  // 格式化视频大小
+  formatVideoSize(videoInfo) {
+    if (!videoInfo.size) {
+      return videoInfo
+    }
+
+    let size = videoInfo.size
+    
+    // 如果已经是格式化的字符串，直接返回
+    if (typeof size === 'string' && size.includes('MB')) {
+      return videoInfo
+    }
+
+    // 如果是数字（字节），转换为MB
+    if (typeof size === 'number') {
+      const sizeInMB = (size / (1024 * 1024)).toFixed(2)
+      videoInfo.size = `${sizeInMB}MB`
+    }
+
+    return videoInfo
   },
 
   onReady() {
@@ -280,8 +309,16 @@ Page({
     }
 
     try {
-      // 复制视频下载链接
-      await util.copyToClipboard(videoInfo.videoUrl)
+      // 构建下载代理链接
+      const api = require('../../utils/api.js')
+      const config = api.getConfig ? api.getConfig() : { baseUrl: 'https://lhbxbuktfrop.sealoshzh.site/api' }
+      const title = videoInfo.title || videoInfo.work_title || '视频'
+      
+      // 使用后端的下载代理接口
+      const downloadUrl = `${config.baseUrl}/video/download?url=${encodeURIComponent(videoInfo.videoUrl)}&title=${encodeURIComponent(title)}`
+      
+      // 复制下载代理链接
+      await util.copyToClipboard(downloadUrl)
       
       // 显示提示信息
       wx.showModal({
@@ -291,7 +328,7 @@ Page({
         confirmText: '知道了'
       })
       
-      console.log('✅ 视频下载链接已复制:', videoInfo.videoUrl)
+      console.log('✅ 视频下载链接已复制:', downloadUrl)
     } catch (error) {
       util.showToast('复制失败')
       console.error('❌ 复制失败:', error)

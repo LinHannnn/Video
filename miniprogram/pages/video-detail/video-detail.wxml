@@ -27,10 +27,9 @@
       
       <!-- 视频信息 -->
       <view class="video-info">
-        <text class="video-title">{{videoInfo.title || videoInfo.work_title || '无标题'}}</text>
-        <view class="video-meta">
-          <text class="meta-item" wx:if="{{videoInfo.duration}}">时长: {{videoInfo.duration}}</text>
-          <text class="meta-item" wx:if="{{videoInfo.size}}">大小: {{videoInfo.size}}</text>
+        <view class="video-title-row">
+          <text class="video-title">{{videoInfo.title || videoInfo.work_title || '无标题'}}</text>
+          <text class="video-size" wx:if="{{videoInfo.size}}">视频大小: {{videoInfo.size}}</text>
         </view>
       </view>
     </view>

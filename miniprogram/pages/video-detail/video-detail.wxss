@@ -84,14 +84,30 @@
   padding: 32rpx;
 }
 
+.video-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
 .video-title {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
   line-height: 1.4;
-  margin-bottom: 16rpx;
   word-break: break-all;
+}
+
+.video-size {
+  display: inline-block;
+  font-size: 24rpx;
+  color: #ff4757;
+  border: 2rpx solid #ff4757;
+  padding: 6rpx 12rpx;
+  border-radius: 6rpx;
+  align-self: flex-end;
+  background: #fff;
 }
 
 .video-meta {
