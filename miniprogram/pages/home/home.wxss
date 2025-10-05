@@ -86,9 +86,29 @@
   padding-left: 0;
 }
 
-/* 横向滚动动画 - 无缝循环 */
-.announcement-scroll {
-  animation: scroll-left 20s linear infinite;
+/* 单条公告横向滚动动画 - 循环移动 */
+.announcement-scroll-single {
+  animation: scroll-single 12s linear infinite;
+}
+
+@keyframes scroll-single {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* 多条公告横向滚动动画 - 无缝循环 */
+.announcement-scroll-multi {
+  /* 默认不播放动画，等待激活 */
+  animation: none;
+}
+
+/* 当前显示的公告才播放动画 */
+.announcement-scroll-multi.active {
+  animation: scroll-left 10s linear infinite;
 }
 
 @keyframes scroll-left {

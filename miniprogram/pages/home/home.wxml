@@ -3,18 +3,30 @@
   <!-- 滚动公告 -->
   <view wx:if="{{announcements.length > 0}}" class="announcement-section">
     <view class="announcement-icon">📢</view>
+    
+    <!-- 单条公告：直接滚动 -->
+    <view wx:if="{{announcements.length === 1}}" class="announcement-item-wrapper">
+      <view class="announcement-item announcement-scroll-single" animation="{{singleAnnouncementAnimation}}">
+        <text class="announcement-text">{{announcements[0].content}}</text>
+      </view>
+    </view>
+    
+    <!-- 多条公告：使用 swiper 切换 -->
     <swiper 
+      wx:else
       class="announcement-swiper" 
       vertical="true" 
       autoplay="true" 
       circular="true" 
-      interval="5000" 
+      interval="4000" 
       duration="500"
+      current="{{currentAnnouncementIndex}}"
+      bindchange="onAnnouncementChange"
     >
       <block wx:for="{{announcements}}" wx:key="id">
         <swiper-item>
           <view class="announcement-item-wrapper">
-            <view class="announcement-item announcement-scroll">
+            <view class="announcement-item announcement-scroll-multi {{currentAnnouncementIndex === index ? 'active' : ''}}">
               <text class="announcement-text">{{item.content}}</text>
               <text class="announcement-text announcement-text-copy">{{item.content}}</text>
             </view>

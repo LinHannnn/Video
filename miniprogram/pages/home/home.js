@@ -11,7 +11,9 @@ Page({
     showLoginModal: false,
     videoInfo: null,
     loginCode: '', // 保存登录 code
-    announcements: [] // 公告列表
+    announcements: [], // 公告列表
+    currentAnnouncementIndex: 0, // 当前公告索引
+    singleAnnouncementAnimation: null // 单条公告的动画对象
   },
 
   onLoad() {
@@ -284,7 +286,8 @@ Page({
       const result = await api.getAnnouncements()
       if (result.code === 200 && result.data) {
         this.setData({
-          announcements: result.data
+          announcements: result.data,
+          currentAnnouncementIndex: 0
         })
         console.log('✅ 加载公告成功', result.data.length, '条')
       }
@@ -292,5 +295,16 @@ Page({
       console.error('❌ 加载公告失败:', error)
       // 加载公告失败不影响主要功能，静默处理
     }
+  },
+
+  // 公告切换事件
+  onAnnouncementChange(e) {
+    const { current } = e.detail
+    console.log('📢 公告切换到:', current)
+    
+    // 更新当前索引，触发动画重新开始
+    this.setData({
+      currentAnnouncementIndex: current
+    })
   }
 })
