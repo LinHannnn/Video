@@ -1,6 +1,4 @@
 {
-  "usingComponents": {
-    "loading": "/components/loading/loading"
-  },
+  "usingComponents": {},
   "navigationBarTitleText": "视频提取助手"
 } 
